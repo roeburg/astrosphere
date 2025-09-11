@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { clearSession } from "@/utils/session"
 
 export async function POST() {
-  clearSession()
-  return NextResponse.json({ ok: true })
+  const res = NextResponse.json({ ok: true })
+  clearSession(res) // clear the HTTP-only cookie
+  return res
 }

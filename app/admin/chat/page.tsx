@@ -1,112 +1,62 @@
 "use client"
 
 import { Navbar } from "@/components/navbar"
-import { ChatUI } from "@/components/chat-ui"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import useSWR from "swr"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useState } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { MessageSquare } from "lucide-react" // A popular icon library, often used with shadcn/ui
 
-type Conversation = {
-  id: string
-  key: string
-  name: string
-  userEmail: string
-  preferredDateTime: string
-  expiresAt: number
-  status: "pending" | "approved" | "rejected"
-  messageCount: number
-  lastMessageAt: number | null
-  isActive: boolean
-}
+// A simple component for numbered list items to make the instructions pop
+const Step = ({ number, children }: { number: number; children: React.ReactNode }) => (
+  <div className="flex items-start gap-4">
+    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
+      {number}
+    </div>
+    <p className="pt-1 text-left text-muted-foreground">{children}</p>
+  </div>
+)
 
-const fetcher = (u: string) => fetch(u).then((r) => r.json())
-
-export default function AdminChatPage() {
-  const { data } = useSWR<{ conversations: Conversation[] }>("/api/chat/conversations", fetcher, {
-    refreshInterval: 4000,
-  })
-  const rows = data?.conversations ?? []
-  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
+export default function WhatsAppRedirectPage() {
+  const whatsappLink = "https://wa.me/qr/TEUDNC4RJMC6F1"
 
   return (
     <main>
       <Navbar />
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-10">
-        <h1 className="text-2xl font-semibold">Admin Chat Console</h1>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Slot</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Active</TableHead>
-                    <TableHead>Messages</TableHead>
-                    <TableHead>Last Activity</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead>Join</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.length ? (
-                    rows.map((c) => (
-                      <TableRow key={c.id}>
-                        <TableCell>{c.name}</TableCell>
-                        <TableCell>{c.userEmail}</TableCell>
-                        <TableCell>{new Date(c.preferredDateTime).toLocaleString()}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="uppercase">
-                            {c.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {c.isActive ? <Badge>Active</Badge> : <Badge variant="outline">Expired</Badge>}
-                        </TableCell>
-                        <TableCell>{c.messageCount}</TableCell>
-                        <TableCell>{c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString() : "—"}</TableCell>
-                        <TableCell className="font-mono">{c.key}</TableCell>
-                        <TableCell>
-                          <Button size="sm" onClick={() => setSelectedKey(c.key)}>
-                            Join Chat
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground">
-                        No conversations yet.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+      <div className="container mx-auto flex min-h-[80vh] items-center justify-center px-4 py-10">
+        <Card className="w-full max-w-2xl overflow-hidden shadow-lg">
+          <CardHeader className="bg-muted/30 p-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-400">
+              <MessageSquare size={32} />
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Browse all approved sessions and join any conversation instantly. Access may be limited to the scheduled
-              time window.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Chat</CardTitle>
+            <CardTitle className="text-3xl font-bold">Connect on WhatsApp</CardTitle>
+            <CardDescription className="text-md mt-2">
+              Ready to schedule your appointment? We're here to help you directly.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            {/* Auto-validates when a key is selected for seamless access */}
-            <ChatUI role="admin" defaultKey={selectedKey} autoValidate={Boolean(selectedKey)} />
+          <CardContent className="p-8">
+            <h2 className="mb-6 text-center text-xl font-semibold">Follow These Simple Steps</h2>
+            <div className="space-y-6">
+              <Step number={1}>
+                Click the button below to be redirected to our official WhatsApp chat. It's fast, secure, and easy.
+              </Step>
+              <Step number={2}>
+                To start the process, please send us your unique <Badge variant="secondary">appointment key</Badge> in
+                the chat.
+              </Step>
+              <Step number={3}>
+                Once you've sent the key, our team will be notified. Please wait for a reply to confirm your appointment
+                details.
+              </Step>
+            </div>
           </CardContent>
+          <CardFooter className="bg-muted/30 p-6">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="w-full">
+              <Button size="lg" className="w-full text-lg">
+                <MessageSquare className="mr-2 h-5 w-5" />
+                Chat on WhatsApp
+              </Button>
+            </a>
+          </CardFooter>
         </Card>
       </div>
     </main>

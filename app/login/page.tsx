@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import { requestOtp, verifyOtp, adminLogin } from "@/utils/api"
 
 export default function LoginPage() {
   return (
@@ -32,73 +33,100 @@ export default function LoginPage() {
 function UserLogin() {
   const [email, setEmail] = useState("")
   const [otp, setOtp] = useState("")
-  const [sent, setSent] = useState<string | null>(null)
+  const [otpSent, setOtpSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const requestOTP = async () => {
+  const handleRequestOtp = async () => {
     setError(null)
-    const res = await fetch("/api/request-otp", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-      headers: { "Content-Type": "application/json" },
-    })
-    const json = await res.json()
-    if (res.ok) setSent(json.otp)
-    else setError(json.error || "Failed to send OTP")
+    try {
+      await requestOtp(email)
+      setOtpSent(true)
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to send OTP")
+    }
   }
 
-  const verify = async () => {
+  const handleVerify = async () => {
     setError(null)
-    const res = await fetch("/api/verify-otp", {
-      method: "POST",
-      body: JSON.stringify({ email, code: otp }),
-      headers: { "Content-Type": "application/json" },
-    })
-    if (res.ok) window.location.href = "/"
-    else setError((await res.json()).error || "Invalid OTP")
+    try {
+      const response = await verifyOtp(email, otp)
+      const { token } = response.data
+      if (token) {
+        localStorage.setItem("authToken", token)
+        window.location.href = "/" // redirect on success
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid OTP")
+    }
   }
 
   return (
     <div className="space-y-3 rounded-md border p-4">
       <label className="text-sm">Email</label>
-      <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-      <Button onClick={requestOTP} disabled={!email}>
+      <Input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+      />
+      <Button onClick={handleRequestOtp} disabled={!email}>
         Send OTP
       </Button>
-      {sent && <div className="text-sm text-muted-foreground">Demo OTP: {sent}</div>}
-      <label className="mt-2 text-sm">Enter OTP</label>
-      <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="6-digit code" />
-      <Button onClick={verify} disabled={!otp}>
-        Verify & Sign In
-      </Button>
+
+      {otpSent && (
+        <>
+          <label className="mt-2 text-sm">Enter OTP</label>
+          <Input
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="6-digit code"
+          />
+          <Button onClick={handleVerify} disabled={!otp}>
+            Verify & Sign In
+          </Button>
+        </>
+      )}
+
       {error && <div className="text-sm text-red-500">{error}</div>}
     </div>
   )
 }
 
 function AdminLogin() {
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("") // renamed for clarity
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
 
-  const signIn = async () => {
+  const handleLogin = async () => {
     setError(null)
-    const res = await fetch("/api/admin-login", {
-      method: "POST",
-      body: JSON.stringify({ username, password }),
-      headers: { "Content-Type": "application/json" },
-    })
-    if (res.ok) window.location.href = "/"
-    else setError((await res.json()).error || "Invalid credentials")
+    try {
+      const response = await adminLogin(email, password)
+      const { token } = response.data
+      if (token) {
+        localStorage.setItem("authToken", token)
+        window.location.href = "/" // redirect on success
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid credentials")
+    }
   }
 
   return (
     <div className="space-y-3 rounded-md border p-4">
-      <label className="text-sm">Username</label>
-      <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="admin" />
+      <label className="text-sm">Email</label>
+      <Input
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="admin@example.com"
+      />
       <label className="text-sm">Password</label>
-      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-      <Button onClick={signIn} disabled={!username || !password}>
+      <Input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="••••••••"
+      />
+      <Button onClick={handleLogin} disabled={!email || !password}>
         Sign In
       </Button>
       {error && <div className="text-sm text-red-500">{error}</div>}

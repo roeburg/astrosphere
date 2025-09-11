@@ -123,3 +123,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Note: The body rule below was a duplicate from your original file. */
+/* I've kept your primary one from @theme. If you need the slate colors, */
+/* you can uncomment the one below and remove the one above. */
+
+/* @layer base {
+  body {
+    @apply bg-slate-900 text-slate-50;
+  }
+} */
+
+
+@layer utilities {
+  /* For the glowing text effect */
+  .text-glow {
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* === ROTATION ANIMATION - GUARANTEED TO WORK === */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 40s linear infinite;
+}

@@ -5,19 +5,33 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
-import { makeNumerology, type NumerologyResult } from "@/utils/numerology"
+import { makeNumerology, numberDetails, rajyogas, type NumerologyResult } from "@/utils/numerology"
 import { LoshuGrid } from "@/components/loshu-grid"
+
+function getRajyogsForNumber(num: number, digitCounts: Record<number, number>) {
+  return rajyogas
+    .filter((yoga) => yoga.numbers.includes(num) && yoga.numbers.every((n) => digitCounts[n] > 0))
+    .map((yoga) => yoga.name)
+}
 
 export default function NumerologyPage() {
   const [name, setName] = useState("")
   const [dob, setDob] = useState("")
-  const [time, setTime] = useState("") // added
-  const [place, setPlace] = useState("") // added
+  const [time, setTime] = useState("")
+  const [place, setPlace] = useState("")
   const [result, setResult] = useState<NumerologyResult | null>(null)
 
   const generate = () => {
-    if (!name || !dob || !time || !place) return
+    if (!name || !dob) return
     setResult(makeNumerology(name, dob))
+  }
+
+  // Collect all numbers to show (unique, including driver and conductor)
+  const getAllNumbers = () => {
+    if (!result) return []
+    const gridNumbers = Object.keys(result.loshu).filter((num) => result.loshu[Number(num)].length > 0).map(Number)
+    const numbers = new Set<number>([result.driver, result.conductor, ...gridNumbers])
+    return Array.from(numbers)
   }
 
   return (
@@ -52,38 +66,85 @@ export default function NumerologyPage() {
         </div>
 
         {result && (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-8">
             <Card>
               <CardHeader>
-                <CardTitle>Core Numbers</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div>
-                  Driver Number: <span className="font-medium">{result.driver}</span>
-                </div>
-                <div>
-                  Conductor Number: <span className="font-medium">{result.conductor}</span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Loshu Grid</CardTitle>
+                <CardTitle>Driver & Conductor Numbers</CardTitle>
               </CardHeader>
               <CardContent>
-                <LoshuGrid loshu={result.loshu} />
+                <p>
+                  <strong>Driver Number:</strong> {result.driver}
+                </p>
+                <p>
+                  <strong>Conductor Number:</strong> {result.conductor}
+                </p>
               </CardContent>
             </Card>
-            <Card className="md:col-span-2">
+            <Card>
               <CardHeader>
-                <CardTitle>Interpretations</CardTitle>
+                <CardTitle>Lo Shu Grid</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {result.interpretations.map((t, i) => (
-                  <p key={i} className="text-sm text-muted-foreground">
-                    {t}
-                  </p>
-                ))}
+              <CardContent>
+                <LoshuGrid loshu={result.loshu} highlight={[result.driver, result.conductor]} />
+              </CardContent>
+            </Card>
+            <div>
+              {getAllNumbers().map((num) => {
+                const detail = numberDetails[num]
+                if (!detail) return null
+                const rajyogs = getRajyogsForNumber(num, result.digitCounts)
+                return (
+                  <Card key={num} className="mb-4">
+                    <CardHeader>
+                      <CardTitle>
+                        Number {detail.number} ({detail.planet})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p>
+                        <strong>Birthdates:</strong> {detail.birthDates.join(", ")}
+                      </p>
+                      <p>
+                        <strong>Ishta Devta:</strong> {detail.ishtaDevta}
+                      </p>
+                      <p>
+                        <strong>Personality Traits:</strong> {detail.personalityTraits.join("; ")}
+                      </p>
+                      <p>
+                        <strong>Advice:</strong> {detail.advice}
+                      </p>
+                      <p>
+                        <strong>Compatibility:</strong> {detail.compatibility.length > 0 ? detail.compatibility.join(", ") : "Universal"}
+                      </p>
+                      <p>
+                        <strong>Strengths:</strong> {detail.strengths.join(", ")}
+                      </p>
+                      <p>
+                        <strong>Weaknesses:</strong> {detail.weaknesses.join(", ")}
+                      </p>
+                      <p>
+                        <strong>Best Decision:</strong> {detail.bestDecision}
+                      </p>
+                      <p>
+                        <strong>Rajyog(s) Present:</strong> {rajyogs.length > 0 ? rajyogs.join(", ") : "None"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>All Rajyogs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc pl-4">
+                  {rajyogas.map((yoga) => (
+                    <li key={yoga.name}>
+                      <strong>{yoga.name}:</strong> {yoga.description}
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           </div>
