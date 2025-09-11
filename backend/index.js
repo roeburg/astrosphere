@@ -27,7 +27,7 @@ app.use(express.json());
 // --- CORS Setup ---
 // Allow your frontend and localhost (for development)
 const allowedOrigins = [
-  "https://astrosphere-822a.vercel.app",
+  process.env.FRONTEND_URL,
   "http://localhost:3000"
 ];
 
