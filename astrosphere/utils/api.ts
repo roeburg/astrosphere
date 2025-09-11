@@ -2,11 +2,11 @@ import axios, { AxiosResponse } from "axios";
 
 // The base URL is now hardcoded to your live Render backend.
 
-//when to test locally 
+//when to test 
 //const base: string =
 //"http://localhost:4000";
 
-const base: string = "https://astrosphere-backend.onrender.com";
+const base: string = "https://astrosphere-zhxo.onrender.com";
 
 export const api = axios.create({ baseURL: base });
 
