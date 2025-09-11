@@ -1,7 +1,12 @@
 import axios, { AxiosResponse } from "axios";
 
-const base: string =
-   "http://localhost:4000";
+// The base URL is now hardcoded to your live Render backend.
+
+//when to test locally 
+//const base: string =
+//"http://localhost:4000";
+
+const base: string = "https://astrosphere-backend.onrender.com";
 
 export const api = axios.create({ baseURL: base });
 
@@ -41,13 +46,10 @@ export async function verifyOtp(email: string, otp: string): Promise<AxiosRespon
   return api.post("/api/auth/verify-otp", { email, otp });
 }
 
-// **FIX THIS FUNCTION**
 export async function adminLogin(email: string, password: string): Promise<AxiosResponse<any>> {
   // Use the 'api' axios instance to call the Express backend
   return api.post("/api/auth/admin-login", { email, password });
 }
-
-
 
 // --- Numerology ---
 export async function fetchNumerology(
