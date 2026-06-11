@@ -25,25 +25,12 @@ const app = express();
 app.use(express.json());
 
 // --- CORS Setup ---
-// Allow your frontend and localhost (for development)
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "http://localhost:3000"
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = "The CORS policy for this site does not allow access from the specified Origin.";
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 // --- Health Check Endpoint ---
 app.get("/", (req, res) => res.send("🚀 Astrosphere API is running..."));
@@ -56,15 +43,22 @@ app.use("/api/appointments", appointmentRoutes);
 
 // --- 404 Not Found Handler ---
 app.use((req, res, next) => {
-  res.status(404).json({ message: "Not Found - The route you are trying to access does not exist." });
+  res.status(404).json({
+    message: "Not Found - The route you are trying to access does not exist.",
+  });
 });
 
 // --- Global Error Handler ---
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error", error: err.message });
+  res.status(500).json({
+    message: "Internal Server Error",
+    error: err.message,
+  });
 });
 
 // --- Server Initialization ---
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🚀 Server successfully started on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Server successfully started on port ${PORT}`)
+);
