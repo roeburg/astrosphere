@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // WARNING: Your secret keys are hardcoded below.
 // This is a security risk. Do not share this file or upload it to a public repository like GitHub.
-const USER_ID = '644475';
-const API_KEY = 'd19b0f663711e0e1f657173b2f25172b855cc9ac';
+const USER_ID = '654250';
+const API_KEY = 'ak-f00163b42c5b0426b5d5272ec531cd4d0a287ffc';
 const API_BASE_URL = 'https://json.astrologyapi.com/v1/';
 
 // Reusable helper function to call the external API
