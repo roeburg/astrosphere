@@ -1,26 +1,20 @@
 import nodemailer from "nodemailer";
 
-const MAIL_HOST = "smtp.gmail.com";
-const MAIL_USER = "sahilthakur6164@gmail.com";
-const MAIL_PASS = "eweknmzipxhttocg"; // Gmail App Password
-
 const transporter = nodemailer.createTransport({
-  host: MAIL_HOST,
-  port: 465,
-  secure: true,
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: MAIL_USER,
-    pass: MAIL_PASS,
+    user: "ae73cd001@smtp-brevo.com",
+    pass: "xsmtpsib-ee18e0ca5113e1a7287653c6705cf75d9826465b3b8f5d2c158d8db510e5e21a-nmbjmr9E1r5zurKp",
   },
 });
 
-// optional: verify connection on startup
 transporter.verify((error, success) => {
   if (error) {
-    console.log("❌ SMTP FULL ERROR");
-    console.log(error);
+    console.error("❌ SMTP connection error:", error);
   } else {
-    console.log("✅ Mailer ready to send emails");
+    console.log("✅ Brevo SMTP Connected");
   }
 });
 
