@@ -33,9 +33,17 @@ export const sendOtp = async (req, res) => {
 
     res.status(200).json({ message: "OTP sent successfully." });
   } catch (error) {
-    console.error("❌ Error sending OTP:", error.message);
-    res.status(500).json({ message: "Failed to send OTP.", error: error.message });
-  }
+  console.log("❌ FULL ERROR START");
+  console.log(error);
+  console.log("❌ FULL ERROR END");
+
+  res.status(500).json({
+    message: "Failed to send OTP.",
+    error: error.message,
+    code: error.code,
+    command: error.command,
+  });
+}
 };
 
 // --- Verify OTP ---
