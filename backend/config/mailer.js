@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
 
 const MAIL_HOST = "smtp.gmail.com";
-const MAIL_USER = "sahil123123456789@gmail.com";
-const MAIL_PASS = "shzuxszcpqjotxys"; // Gmail App Password
+const MAIL_USER = "sahilthakur6164@gmail.com";
+const MAIL_PASS = "eweknmzipxhttocg"; // Gmail App Password
 
 const transporter = nodemailer.createTransport({
   host: MAIL_HOST,
