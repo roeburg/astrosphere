@@ -6,7 +6,7 @@ const otpStore = new Map();
 
 // --- Constants ---
 const JWT_SECRET = "sahil";
-const MAIL_USER = "sahilthakur6164@gmail.com"; // must match mailer.js
+const MAIL_USER = "ae73cd001@smtp-brevo.com"; // must match mailer.js
 const ADMIN_EMAIL = "admin";
 const ADMIN_PASSWORD = "admin123";
 
